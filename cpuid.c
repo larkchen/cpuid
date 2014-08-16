@@ -253,7 +253,7 @@ BOOL cpuid_load_from_file(const char *filename, struct cpuid_state_t *state)
 	if (cpucount < 1)
 		cpucount = 1;
 
-	state->cpu_logical_count = cpucount;
+	state->cpu_logical_count = (uint32_t)cpucount;
 
 	state->cpuid_leaves = (struct cpuid_leaf_t **)malloc(sizeof(struct cpuid_leaf_t *) * (cpucount + 1));
 	assert(state->cpuid_leaves);
@@ -507,17 +507,46 @@ void cpuid_dump_etallen(struct cpu_regs_t *regs, struct cpuid_state_t *state, __
 	       regs->edx);
 }
 
-void cpuid_dump_vmware(struct cpu_regs_t *regs, struct cpuid_state_t *state, __unused_variable BOOL indexed)
+static const char *uint32_to_vmx(char *buffer, uint32_t val)
 {
-	char buffer[33];
-	/* Not sure what VMware's format is for that. */
-	if (indexed)
-		return;
+    /* Print string in delimited format used by VMware - DWP */
+	int i = 0;
+    int j = 0;
+    int k = 38;
+    
+	for (i = 0; i < 32; i++) {
+         if (j == 4){
+            j = 0;
+            k--;
+        }
+		buffer[k] = (val & (1 << i)) != 0 ? '1' : '0';
+        j++;
+        k--;
+	}
+	return buffer;
+}
+
+void cpuid_dump_vmware(struct cpu_regs_t *regs, struct cpuid_state_t *state, BOOL indexed)
+{
+    
+    /* Initialise string to delimited format used by VMware - DWP */
+    char buffer[40] = "----:----:----:----:----:----:----:----";
+
 	/* Skip the hypervisor leaf. */
 	if ((0xF0000000 & state->last_leaf.eax) == 0x40000000)
 		return;
-	printf("cpuid.%x.eax = \"%s\"\n", state->last_leaf.eax, uint32_to_binary(buffer, regs->eax));
-	printf("cpuid.%x.ebx = \"%s\"\n", state->last_leaf.eax, uint32_to_binary(buffer, regs->ebx));
-	printf("cpuid.%x.ecx = \"%s\"\n", state->last_leaf.eax, uint32_to_binary(buffer, regs->ecx));
-	printf("cpuid.%x.edx = \"%s\"\n", state->last_leaf.eax, uint32_to_binary(buffer, regs->edx));
+
+    /* Added indexed leaves e.g. 0x00000004 - DWP */
+	if (!indexed) {
+        printf("cpuid.%x.eax = \"%s\"\n", state->last_leaf.eax, uint32_to_vmx(buffer, regs->eax));
+        printf("cpuid.%x.ebx = \"%s\"\n", state->last_leaf.eax, uint32_to_vmx(buffer, regs->ebx));
+        printf("cpuid.%x.ecx = \"%s\"\n", state->last_leaf.eax, uint32_to_vmx(buffer, regs->ecx));
+        printf("cpuid.%x.edx = \"%s\"\n", state->last_leaf.eax, uint32_to_vmx(buffer, regs->edx));
+    }
+    else {
+        printf("cpuid.%x.%x.eax = \"%s\"\n", state->last_leaf.eax, state->last_leaf.ecx, uint32_to_vmx(buffer, regs->eax));
+        printf("cpuid.%x.%x.ebx = \"%s\"\n", state->last_leaf.eax, state->last_leaf.ecx, uint32_to_vmx(buffer, regs->ebx));
+        printf("cpuid.%x.%x.ecx = \"%s\"\n", state->last_leaf.eax, state->last_leaf.ecx, uint32_to_vmx(buffer, regs->ecx));
+        printf("cpuid.%x.%x.edx = \"%s\"\n", state->last_leaf.eax, state->last_leaf.ecx, uint32_to_vmx(buffer, regs->edx));
+    }
 }

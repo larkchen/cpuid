@@ -59,7 +59,7 @@ extern int utilUnbindThreadFromCPU(void);
 
 #include "state.h"
 
-uint32_t thread_count_native(struct cpuid_state_t *state)
+uint32_t thread_count_native( __unused_variable struct cpuid_state_t *state)
 {
 #ifdef TARGET_OS_MACOSX
 	uint32_t count;
@@ -129,7 +129,7 @@ uintptr_t thread_get_binding(void)
 #endif
 }
 
-uintptr_t thread_bind_mask(uintptr_t _mask)
+uintptr_t thread_bind_mask( __unused_variable uintptr_t _mask)
 {
 #ifdef TARGET_OS_WINDOWS
 
@@ -168,7 +168,7 @@ uintptr_t thread_bind_mask(uintptr_t _mask)
 #endif
 }
 
-int thread_bind_native(__unused_variable struct cpuid_state_t *state, uint32_t id)
+int thread_bind_native(__unused_variable struct cpuid_state_t *state, __unused_variable uint32_t id)
 {
 #ifdef TARGET_OS_WINDOWS
 

@@ -130,15 +130,19 @@ invalid_leaf:
 
 static void usage(const char *argv0)
 {
-	printf("usage: %s [--help] [--dump] [--ignore-vendor] [--parse <filename>]\n\n", argv0);
-	printf("  %-18s %s\n", "-h, --help", "Print this list of options");
-	printf("  %-18s %s\n", "-c, --cpu", "Index (starting at 0) of CPU to get info from");
-	printf("  %-18s %s\n", "-d, --dump", "Dump a raw CPUID table");
-	printf("  %-18s %s\n", "--ignore-vendor", "Show feature flags from all vendors");
-	printf("  %-18s %s\n", "-f, --parse", "Read and decode a raw cpuid table from the file specified");
-	printf("  %-18s %s\n", "--sanity", "Do a sanity check of the CPUID data");
-	printf("\n");
-	exit(0);
+    printf("usage: %s [--help] [--dump] [--ignore-vendor] [--parse <filename>]\n\n", argv0);
+    printf("  %-18s %s\n", "-v, --version", "Print version");
+    printf("  %-18s %s\n", "-h, --help", "Print this list of options");
+    printf("  %-18s %s\n", "-c, --cpu", "Index (starting at 0) of CPU to get info from");
+    printf("  %-18s %s\n", "-k, --kernel", "Ask kernel for CPUID data");
+    printf("  %-18s %s\n", "-d, --dump", "Dump a raw CPUID table");
+    printf("  %-18s %s\n", "--ignore-vendor", "Show feature flags from all vendors");
+    printf("  %-18s %s\n", "-f, --parse", "Read and decode a raw cpuid table from the file specified");
+    printf("  %-18s %s\n", "--sanity", "Do a sanity check of the CPUID data");
+    printf("  %-18s %s\n", "--scan-to", "Index (starting at 0) of CPUID to get info from");
+    printf("  %-18s %s\n", "-o, --format", "Format CPUID for differnt programs <vmware|xen|sxp|etallen>");
+    printf("\n");
+    exit(0);
 }
 
 static void version(void)

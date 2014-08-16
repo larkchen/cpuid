@@ -155,7 +155,7 @@ static int sane_apicid(struct cpuid_state_t *state)
 	worker_count = hwthreads / 4 + 1;
 
 	/* Store the current affinity mask. It will get clobbered. */
-	oldbinding = thread_get_binding();
+	oldbinding = (uint32_t) thread_get_binding();
 
 	printf("Verifying APIC ID sanity");
 
@@ -368,7 +368,7 @@ int sanity_run(struct cpuid_state_t *state)
 #endif
 	while (*p) {
 		if ((*p++)(state) != 0)
-			ret = p - handlers;
+			ret = (uint32_t) (p - handlers);
 	}
 #ifdef TARGET_OS_WINDOWS
 	timeEndPeriod(tc.wPeriodMin);

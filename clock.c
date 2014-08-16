@@ -29,9 +29,23 @@ static uint32_t cycles_per_usec;
 
 static uint64_t wallclock_ns(void)
 {
+    double nseconds;
+    double seconds;
+#ifdef TARGET_OS_MACOSX
+#include <mach/mach_time.h>
+    mach_timebase_info_data_t timebase;
+    mach_timebase_info(&timebase);
+    uint64_t time;
+    time = mach_absolute_time();
+    nseconds = ((double)time * (double)timebase.numer)/((double)timebase.denom);
+    seconds = ((double)time * (double)timebase.numer)/((double)timebase.denom * 1e9);
+#else
 	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC, &ts);
-	return (ts.tv_sec * 1000000000ULL) + ts.tv_nsec;
+    seconds = t->tv_sec;
+    nseconds = t->tv_nsec;
+#endif
+    return (seconds * 1000000000ULL) + nseconds;
 }
 
 static uint32_t get_cycles_per_usec(void)
@@ -52,7 +66,7 @@ static uint32_t get_cycles_per_usec(void)
 		}
 	} while (1);
 
-	return (c_e - c_s + 127) >> 7;
+	return (uint32_t) ((c_e - c_s + 127) >> 7);
 }
 
 static void calibrate_cpu_clock(void)
